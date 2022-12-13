@@ -1,0 +1,78 @@
+SELECT * FROM ticketjk.ticket;CREATE TABLE `category` (
+  `categoryID` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) DEFAULT NULL,
+  `description` tinytext,
+  PRIMARY KEY (`categoryID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `message` (
+  `messageID` int NOT NULL AUTO_INCREMENT,
+  `ticketID` int NOT NULL,
+  `userID` int NOT NULL,
+  `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `message` tinytext,
+  PRIMARY KEY (`messageID`,`ticketID`),
+  KEY `fk_message_ticket_idx` (`ticketID`),
+  CONSTRAINT `fk_message_ticket` FOREIGN KEY (`ticketID`) REFERENCES `ticket` (`ticketID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='messages under a ticket';
+
+CREATE TABLE `progress` (
+  `progressID` int NOT NULL AUTO_INCREMENT,
+  `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `message` tinytext,
+  `ticketID` int NOT NULL,
+  `statusID` int NOT NULL,
+  `technicianID` int NOT NULL COMMENT 'ID of the technician updating the progress of a ticket',
+  PRIMARY KEY (`progressID`,`ticketID`,`statusID`),
+  KEY `fk_progress_ticket1_idx` (`ticketID`),
+  KEY `fk_progress_status1_idx` (`statusID`),
+  KEY `fk_progress_user1_idx` (`technicianID`),
+  CONSTRAINT `fk_progress_status1` FOREIGN KEY (`statusID`) REFERENCES `status` (`statusID`),
+  CONSTRAINT `fk_progress_ticket1` FOREIGN KEY (`ticketID`) REFERENCES `ticket` (`ticketID`),
+  CONSTRAINT `fk_progress_user1` FOREIGN KEY (`technicianID`) REFERENCES `user` (`userID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='keep track of who and when updates the status of a ticket';
+
+CREATE TABLE `status` (
+  `statusID` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `description` tinytext,
+  PRIMARY KEY (`statusID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `ticket` (
+  `ticketID` int NOT NULL AUTO_INCREMENT,
+  `issueDescription` text,
+  `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `userID` int NOT NULL,
+  `categoryID` int NOT NULL,
+  PRIMARY KEY (`ticketID`,`userID`,`categoryID`),
+  KEY `fk_ticket_user1_idx` (`userID`),
+  KEY `fk_ticket_category1_idx` (`categoryID`),
+  CONSTRAINT `fk_ticket_category1` FOREIGN KEY (`categoryID`) REFERENCES `category` (`categoryID`),
+  CONSTRAINT `fk_ticket_user1` FOREIGN KEY (`userID`) REFERENCES `user` (`userID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `user` (
+  `userID` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(16) NOT NULL,
+  `password` varchar(32) NOT NULL,
+  `email` varchar(320) NOT NULL,
+  `created` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `technician` tinyint DEFAULT '0',
+  `closed` tinyint DEFAULT '0',
+  PRIMARY KEY (`userID`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE `user_has_category` (
+  `user_has_categoryID` int NOT NULL AUTO_INCREMENT,
+  `userID` int NOT NULL,
+  `categoryID` int NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `description` text,
+  PRIMARY KEY (`user_has_categoryID`,`userID`,`categoryID`),
+  KEY `fk_user_has_category_category1_idx` (`categoryID`),
+  KEY `fk_user_has_category_user1_idx` (`userID`),
+  CONSTRAINT `fk_user_has_category_category1` FOREIGN KEY (`categoryID`) REFERENCES `category` (`categoryID`),
+  CONSTRAINT `fk_user_has_category_user1` FOREIGN KEY (`userID`) REFERENCES `user` (`userID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
