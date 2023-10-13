@@ -3,10 +3,11 @@ from mysql.connector import Error
 
 
 # initialize connection to database server
-def init(address, database, username, password):
+def init(address, database, username, password, port = 3306):
 
     try:
         connection = mysql.connector.connect(host=address,
+                                             port=port,
                                              database=database,
                                              user=username,
                                              password=password)

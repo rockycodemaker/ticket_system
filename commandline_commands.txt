@@ -1,0 +1,4 @@
+docker build -t ticket-api .
+docker run -p 8080:80 ticket-api
+
+uvicorn API:app
